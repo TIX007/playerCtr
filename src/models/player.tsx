@@ -1,7 +1,7 @@
 
 import { useAnimations, useGLTF, useKeyboardControls } from "@react-three/drei";
 import { useFrame, useThree, RootState } from "@react-three/fiber";
-import { CapsuleCollider, RapierRigidBody, RigidBody } from "@react-three/rapier";
+import { CapsuleCollider, RapierRigidBody, RigidBody, quat, euler } from "@react-three/rapier";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { toFixed } from "../utils";
@@ -37,6 +37,26 @@ function Player() {
   const player = useRef<RapierRigidBody>(null); // 玩家的引用
   useKeyboardControls((state) => move(state)) // 监听自定义键盘事件
 
+  // 帧渲染
+  useFrame((state: RootState, delta) => {
+    if (!player.current) return;
+    // 人物移动时进行旋转
+    if (direction.x !== 0 || direction.z !== 0) {
+      rotation();
+    }
+  })
+
+  // 人物旋转
+  function rotation() {
+    if (!player.current) return
+    const rotationAngle = Math.atan2(direction.x, direction.z); // 旋转角度
+    // 直接使用四元数进行旋转
+    const rotationEuler = euler().set(0, rotationAngle, 0); // 旋转欧拉角
+    const rotationQuaternion = quat().setFromEuler(rotationEuler); // 目标旋转四元数
+    const startQuaternion = quat().copy(player.current.rotation()); // 当前旋转四元数
+    startQuaternion.slerp(rotationQuaternion, 0.2);
+    player.current.setRotation(startQuaternion, true);
+  }
 
   function move(state: {
     [key: string]: boolean;
