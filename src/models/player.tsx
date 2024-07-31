@@ -16,6 +16,10 @@ function Player() {
     idle,
     run
   }
+  // (interface)接口ControlDispatcher继承(extends)了THREE.EventDispatcher，ControlDispatcher拥有THREE.EventDispatcher的所有属性，并且可以有自己的属性
+  interface ControlDispatcher extends THREE.EventDispatcher {
+    getDistance(): number;
+  }
   // 加载模型
   const { scene, animations } = useGLTF("./player/actor.gltf");
   const { ref, actions, names } = useAnimations(animations, scene);
@@ -40,6 +44,11 @@ function Player() {
   // 帧渲染
   useFrame((state: RootState, delta) => {
     if (!player.current) return;
+
+    // 玩家移动前的相机距离，用来确保跟随玩家移动
+    const distance = toFixed((state.controls as ControlDispatcher).getDistance())
+    // 更新相机位置
+    updateCamera(state, distance, delta)
     // 人物移动时进行旋转
     if (direction.x !== 0 || direction.z !== 0) {
       rotation();
@@ -56,6 +65,25 @@ function Player() {
     const startQuaternion = quat().copy(player.current.rotation()); // 当前旋转四元数
     startQuaternion.slerp(rotationQuaternion, 0.2);
     player.current.setRotation(startQuaternion, true);
+  }
+
+  // 更新相机位置
+  function updateCamera(state: any, distance: number, delta: number) {
+    if (!player.current) return;
+
+    const playerPos = player.current.translation(); // 玩家世界坐标
+
+    const rotateDelta = (direction.x / 100) * delta;
+
+    const { camera, controls } = state;
+    controls.target.copy(playerPos);
+    const spherical = new THREE.Spherical(
+      distance,
+      controls.getPolarAngle(),
+      controls.getAzimuthalAngle() - rotateDelta
+    );
+    const position = new THREE.Vector3().setFromSpherical(spherical);
+    camera.position.copy(playerPos).add(position);
   }
 
   function move(state: {
