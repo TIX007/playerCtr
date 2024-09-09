@@ -45,7 +45,7 @@ function Player() {
   useFrame((state: RootState, delta) => {
     if (!player.current) return;
 
-    // 玩家移动前的相机距离，用来确保跟随玩家移动
+    // 玩家移动前的相机距离，用来确保跟随玩家移动****
     const distance = toFixed((state.controls as ControlDispatcher).getDistance())
     // 更新相机位置
     updateCamera(state, distance, delta)
