@@ -38,7 +38,7 @@ function Player() {
   }, [actions, names, status])
 
 
-  const player = useRef<RapierRigidBody>(null); // 玩家的引用
+  const player = useRef<RapierRigidBody>(null); // 玩家的引用*****
   useKeyboardControls((state) => move(state)) // 监听自定义键盘事件
 
   // 帧渲染
