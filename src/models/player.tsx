@@ -45,7 +45,7 @@ function Player() {
   useFrame((state: RootState, delta) => {
     if (!player.current) return;
 
-    // 玩家移动前的相机距离，用来确保跟随玩家移动
+    // 玩家移动前的相机距离，用来确保跟随玩家移动****
     const distance = toFixed((state.controls as ControlDispatcher).getDistance())
     // 更新相机位置
     updateCamera(state, distance, delta)
@@ -105,7 +105,7 @@ function Player() {
       player.current.setLinvel({ x: 0, y: JUMP, z: 0 }, true)
     }
     console.log(jump, '***jump');
-    // 播放动画 当速度不为0或跳跃时播放 run动画
+    // 播放动画 当速度不为0或跳跃时播放 run动画****
     let key = names[STATUS.idle]
     if (direction.x !== 0 || direction.z !== 0 || jump) {
       key = names[STATUS.run]
